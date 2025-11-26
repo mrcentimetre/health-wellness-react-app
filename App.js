@@ -1,20 +1,36 @@
+import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { Provider } from 'react-redux';
+import { View, ActivityIndicator } from 'react-native';
+import { ThemeProvider } from './src/context/ThemeContext';
+import store, { initializeStore } from './src/store';
+import AppNavigator from './src/navigation/AppNavigator';
 
 export default function App() {
+  const [storeReady, setStoreReady] = useState(false);
+
+  useEffect(() => {
+    const setupStore = async () => {
+      await initializeStore();
+      setStoreReady(true);
+    };
+    setupStore();
+  }, []);
+
+  if (!storeReady) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#6C63FF" />
+      </View>
+    );
+  }
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <Provider store={store}>
+      <ThemeProvider>
+        <StatusBar style="auto" />
+        <AppNavigator />
+      </ThemeProvider>
+    </Provider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
